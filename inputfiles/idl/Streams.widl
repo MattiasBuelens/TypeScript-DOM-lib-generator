@@ -4,6 +4,7 @@
 interface ReadableStream {
     readonly attribute boolean locked;
     Promise<void> cancel(optional any reason);
+    ReadableStreamAsyncIterator getIterator(any options);
     ReadableStreamBYOBReader getReader(any options);
     ReadableStreamDefaultReader getReader();
     any pipeThrough(any pair, optional PipeOptions options);
@@ -97,6 +98,12 @@ interface ReadableStreamBYOBRequest {
 
     void respond(unsigned long bytesWritten);
     void respondWithNewView(ArrayBufferView view);
+};
+
+[Exposed=(Window,Worker)]
+interface ReadableStreamAsyncIterator {
+    Promise<any> next();
+    Promise<any> return(optional any value);
 };
 
 [Constructor(optional UnderlyingSink underlyingSink, optional QueuingStrategy strategy),

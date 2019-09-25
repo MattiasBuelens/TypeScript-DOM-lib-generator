@@ -2426,6 +2426,7 @@ interface ReadableByteStreamController {
 interface ReadableStream<R = any> {
     readonly locked: boolean;
     cancel(reason?: any): Promise<void>;
+    getIterator(options: any): ReadableStreamAsyncIterator;
     getReader(options: { mode: "byob" }): ReadableStreamBYOBReader;
     getReader(): ReadableStreamDefaultReader<R>;
     pipeThrough<T>({ writable, readable }: { writable: WritableStream<R>, readable: ReadableStream<T> }, options?: PipeOptions): ReadableStream<T>;
@@ -2437,6 +2438,16 @@ declare var ReadableStream: {
     prototype: ReadableStream;
     new(underlyingSource: UnderlyingByteSource, strategy?: { highWaterMark?: number, size?: undefined }): ReadableStream<Uint8Array>;
     new<R = any>(underlyingSource?: UnderlyingSource<R>, strategy?: QueuingStrategy<R>): ReadableStream<R>;
+};
+
+interface ReadableStreamAsyncIterator {
+    next(): Promise<any>;
+    return(value?: any): Promise<any>;
+}
+
+declare var ReadableStreamAsyncIterator: {
+    prototype: ReadableStreamAsyncIterator;
+    new(): ReadableStreamAsyncIterator;
 };
 
 interface ReadableStreamBYOBReader {
