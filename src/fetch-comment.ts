@@ -152,9 +152,13 @@ function retargetCommentKey(key: string, dom: DocumentFragment) {
     if (dfn.dataset.dfnFor) {
       parent = dfn.dataset.dfnFor;
     }
-    member = dfn.textContent!.trim();
-    // Remove arguments from methods
-    member = member.replace(/\([\s\S]*$/, '');
+    if (dfn.dataset.dfnType === 'constructor') {
+      member = 'constructor';
+    } else {
+      member = dfn.textContent!.trim();
+      // Remove arguments from methods
+      member = member.replace(/\([\s\S]*$/, '');
+    }
   }
   if (!member) {
     return parent.toLowerCase();

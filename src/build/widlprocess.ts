@@ -211,6 +211,9 @@ function convertInterfaceCommon(
       };
     }
   }
+  if (result.constructor) {
+    addComments(result.constructor, commentMap, i.name, 'constructor');
+  }
 
   return result;
 }
