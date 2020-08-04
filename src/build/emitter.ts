@@ -1123,7 +1123,7 @@ export function emitWebIdl(
 
     // Emit constructor signature
     if (constructor) {
-      emitComments(constructor, printer.print);
+      emitComments(constructor, printer.printLine);
       emitSignatures(constructor, "", "new", printer.printLine);
     } else {
       printer.printLine(`new(): ${i.name};`);
