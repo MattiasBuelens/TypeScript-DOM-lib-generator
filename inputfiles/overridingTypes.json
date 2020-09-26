@@ -204,6 +204,28 @@
                         }
                     }
                 }
+            },
+            "GenericTransformStream": {
+                "type-parameters": [
+                    {
+                        "name": "R",
+                        "default": "any"
+                    },
+                    {
+                        "name": "W",
+                        "default": "any"
+                    }
+                ],
+                "properties": {
+                    "property": {
+                        "readable": {
+                            "override-type": "ReadableStream<R>"
+                        },
+                        "writable": {
+                            "override-type": "WritableStream<W>"
+                        }
+                    }
+                }
             }
         }
     },
