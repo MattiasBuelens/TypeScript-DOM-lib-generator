@@ -18,12 +18,18 @@ const knownBadDescriptions = [
 fetchInterfaceDescriptions();
 
 async function fetchInterfaceDescriptions() {
-  const interfaceNames = await getAllIdlInterfaces();
+  const interfaceNames = (await getAllIdlInterfaces()).slice(0, 5);
   const descriptions: Record<string, string> = {};
 
-  await interfaceNames.reduce(async (previousRequest, name) => {
+  console.log(`Fetching ${interfaceNames.length} interface descriptions...`);
+  await interfaceNames.reduce(async (previousRequest, name, index) => {
     // Issuing too many requests in parallel causes 504 gateway errors, so chain
     await previousRequest;
+
+    if (index % 25 === 0) {
+      console.log(`...Fetched ${index} pages`);
+      flush();
+    }
 
     const response = await fetch(
       `https://developer.mozilla.org/en-US/docs/Web/API/${name}$json`
@@ -36,6 +42,8 @@ async function fetchInterfaceDescriptions() {
     }
   }, Promise.resolve());
 
+  flush();
+
   function addDescription(name: string, page: Page) {
     if (page.summary && !knownBadDescriptions.includes(name)) {
       const fragment = JSDOM.fragment(page.summary);
@@ -43,10 +51,12 @@ async function fetchInterfaceDescriptions() {
     }
   }
 
-  fs.writeFileSync(
-    "inputfiles/mdn/apiDescriptions.json",
-    JSON.stringify(descriptions, null, 2)
-  );
+  function flush() {
+    fs.writeFileSync(
+      "inputfiles/mdn/apiDescriptions.json",
+      JSON.stringify(descriptions, null, 2)
+    );
+  }
 }
 
 async function getAllIdlInterfaces(): Promise<string[]> {
