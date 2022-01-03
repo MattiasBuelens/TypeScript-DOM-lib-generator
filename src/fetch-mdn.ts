@@ -1,6 +1,8 @@
 import * as fs from "fs";
 import fetch from "node-fetch";
 import { JSDOM } from "jsdom";
+import { listAll as listAllIdl } from "@webref/idl";
+import * as webidl2 from "webidl2";
 
 interface Page {
   summary: string;
@@ -16,8 +18,7 @@ const knownBadDescriptions = [
 fetchInterfaceDescriptions();
 
 async function fetchInterfaceDescriptions() {
-  const webIdl = require("../inputfiles/browser.webidl.preprocessed.json");
-  const interfaceNames = Object.keys(webIdl.interfaces.interface).sort();
+  const interfaceNames = await getAllIdlInterfaces();
   const descriptions: Record<string, string> = {};
 
   await interfaceNames.reduce(async (previousRequest, name) => {
@@ -46,4 +47,19 @@ async function fetchInterfaceDescriptions() {
     "inputfiles/mdn/apiDescriptions.json",
     JSON.stringify(descriptions, null, 2)
   );
+}
+
+async function getAllIdlInterfaces(): Promise<string[]> {
+  const idl = await listAllIdl();
+  const interfaceNames = new Set<string>();
+  for (const [, file] of Object.entries(idl)) {
+    const text = await file.text();
+    const rootTypes = webidl2.parse(text);
+    for (const rootType of rootTypes) {
+      if (rootType.type === "interface") {
+        interfaceNames.add(rootType.name);
+      }
+    }
+  }
+  return [...interfaceNames].sort();
 }
